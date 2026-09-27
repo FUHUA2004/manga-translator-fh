@@ -6,7 +6,7 @@ screenshotDialog.addEventListener('click', event => {
   if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) screenshotDialog.close();
 });
 document.getElementById('copy-hash').addEventListener('click', async () => {
-  const hash = '80b3bb9b9a15fc55d931b4d03e7326e74aea6c3d4c25616916330a0a63687d6c';
+  const hash = '3094b0e1e6975a6fc8edbdda9682db618de40103da5382ec3f59a371562b36b2';
   const status = document.getElementById('copy-status');
   try {
     await navigator.clipboard.writeText(hash);
