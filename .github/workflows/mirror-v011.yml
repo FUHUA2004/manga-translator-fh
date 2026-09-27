@@ -11,8 +11,17 @@ jobs:
     steps:
       - name: Download and verify the existing public installer
         run: |
-          curl --fail --location --retry 3 --output MangaTranslator-Setup-0.1.1-windows-x64.exe \
-            'https://manga-translator-fh.bonny-mole-6291.chatgpt.site/downloads/MangaTranslator-Setup-0.1.1-windows-x64.exe'
+          file='MangaTranslator-Setup-0.1.1-windows-x64.exe'
+          url='https://manga-translator-fh.bonny-mole-6291.chatgpt.site/downloads/MangaTranslator-Setup-0.1.1-windows-x64.exe'
+          expected_size=771485215
+          for attempt in $(seq 1 20); do
+            curl --http1.1 --fail --location --continue-at - --output "$file" "$url" || true
+            size=$(stat -c '%s' "$file" 2>/dev/null || echo 0)
+            if [ "$size" -eq "$expected_size" ]; then break; fi
+            if [ "$size" -gt "$expected_size" ]; then echo 'Unexpected file size'; exit 1; fi
+            sleep 2
+          done
+          test "$(stat -c '%s' "$file")" -eq "$expected_size"
           echo '3094b0e1e6975a6fc8edbdda9682db618de40103da5382ec3f59a371562b36b2  MangaTranslator-Setup-0.1.1-windows-x64.exe' | sha256sum --check
       - name: Publish verified installer on GitHub Releases
         env:
