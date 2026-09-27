@@ -1,0 +1,25 @@
+name: Mirror verified v0.1.1 installer
+
+on:
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download and verify the existing public installer
+        run: |
+          curl --fail --location --retry 3 --output MangaTranslator-Setup-0.1.1-windows-x64.exe \
+            'https://manga-translator-fh.bonny-mole-6291.chatgpt.site/downloads/MangaTranslator-Setup-0.1.1-windows-x64.exe'
+          echo '3094b0e1e6975a6fc8edbdda9682db618de40103da5382ec3f59a371562b36b2  MangaTranslator-Setup-0.1.1-windows-x64.exe' | sha256sum --check
+      - name: Publish verified installer on GitHub Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.1.1 MangaTranslator-Setup-0.1.1-windows-x64.exe \
+            --repo "$GITHUB_REPOSITORY" \
+            --title 'v0.1.1 Windows 测试版' \
+            --notes '原网站已公开提供的 Windows x64 安装包；SHA-256：3094b0e1e6975a6fc8edbdda9682db618de40103da5382ec3f59a371562b36b2。未签名测试版，其他电脑兼容性仍待验证。' \
+            --prerelease
